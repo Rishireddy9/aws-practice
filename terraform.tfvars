@@ -1,0 +1,1 @@
+ami_id = "ami-051a31ab2f4d498f5"
