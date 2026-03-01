@@ -8,6 +8,7 @@ resource "aws_subnet" "web-app-public-subnet" {
   vpc_id = aws_vpc.web-app.id
   cidr_block = "10.0.1.0/24"
   map_public_ip_on_launch = true
+  availability_zone = "ap-south-1a"
   tags = {
     Name = "web-app-public-subnet"
   }
@@ -29,6 +30,7 @@ resource "aws_route_table_association" "web-app-rt-ass" {
 }
 resource "aws_security_group" "web-app-sg" {
   name = "web-app-sg"
+  vpc_id = aws_vpc.web-app.id
   ingress {
     from_port = 22
     to_port = 22
@@ -50,7 +52,7 @@ resource "aws_security_group" "web-app-sg" {
 }
 resource "aws_key_pair" "terraform-key" {
   key_name = "terraform-key"
-  public_key = file(terraform-key.pub)
+  public_key = file("terraform-key.pub")
 }
 resource "aws_instance" "web-app-instance" {
     subnet_id = aws_subnet.web-app-public-subnet.id
@@ -59,6 +61,7 @@ resource "aws_instance" "web-app-instance" {
     key_name = aws_key_pair.terraform-key.key_name
     instance_type = var.instance-type
     user_data = <<-EOF
+                #!/bin/bash
                 yum update -y
                 yum install nginx -y
                 systemctl start nginx
